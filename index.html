@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solicitudes de Impresión 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+/* Layout: columna de trabajo (max 800px) con secciones numeradas como la plantilla; cabecera con marca Si3 y tres pestañas. Paleta tomada de si-3.tech (teal, azul, pizarra). */
+:root{
+  --bg:#f0f5fa; --panel:#ffffff; --ink:#1e293b; --text:#334155; --muted:#5b6b80; --line:#d1d5db;
+  --accent:#0f8f86; --accent-ink:#ffffff; --accent-soft:#e8f8f6; --blue:#2f66d0; --logo:#3a7bc8;
+  --ok:#2b8a3e; --warn:#a86b00; --bad:#c92a2a;
+  --chip:#e6edf3; --field:#f8fafc;
+  --f-display:"Inter Tight","Inter",Arial,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161b; --panel:#15212a; --ink:#e8eef2; --text:#cbd5df; --muted:#93a3b3; --line:#2a3a46;
+  --accent:#5fd9c8; --accent-ink:#06302c; --accent-soft:#123532; --blue:#86a9f0; --logo:#7fb0ea;
+  --ok:#5cc46f; --warn:#e3b23c; --bad:#ff6b6b;
+  --chip:#1f2e38; --field:#111b22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161b; --panel:#15212a; --ink:#e8eef2; --text:#cbd5df; --muted:#93a3b3; --line:#2a3a46;
+  --accent:#5fd9c8; --accent-ink:#06302c; --accent-soft:#123532; --blue:#86a9f0; --logo:#7fb0ea;
+  --ok:#5cc46f; --warn:#e3b23c; --bad:#ff6b6b;
+  --chip:#1f2e38; --field:#111b22; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:800px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
+header{display:flex;flex-direction:column;gap:14px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mark{display:block;width:78px;height:40px;flex:none;background:var(--logo);-webkit-mask:url(data:image/png;base64,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) center/contain no-repeat;mask:url(data:image/png;base64,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) center/contain no-repeat}
+.teams{background:#4b53bc;color:#fff;border-color:#4b53bc}
+.brand-t{display:flex;flex-direction:column;min-width:0}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.65rem;line-height:1.1;margin:0;color:var(--ink);text-wrap:balance}
+.brand small{font-size:.8rem;color:var(--muted)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tab{font:600 .92rem var(--f-body);padding:9px 14px;border:0;border-bottom:3px solid transparent;background:none;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,.opt input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px}
+.notice{font-size:.85rem;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
+.notice.draft{border-style:solid;border-color:var(--accent);background:var(--accent-soft);color:var(--ink);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+section.block{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:16px}
+form{display:flex;flex-direction:column;gap:14px}
+.sec-h{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.sec-h b{font-family:var(--f-mono);font-size:.78rem;color:var(--accent)}
+.sec-h h2{font-family:var(--f-display);font-weight:600;font-size:1.15rem;margin:0;color:var(--ink)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.grid{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f.full{grid-column:1/-1}
+.l{font-weight:600;font-size:.88rem;color:var(--ink)}
+.req{color:var(--accent)}
+.hint{font-size:.8rem;color:var(--muted)}
+input[type=text],input[type=email],input[type=number],input[type=date],input[type=url],select,textarea{
+  font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:9px 10px;width:100%;min-width:0}
+textarea{min-height:88px;resize:vertical}
+.bad-field{border-color:var(--bad)!important;box-shadow:0 0 0 1px var(--bad)}
+.opts.bad-field{box-shadow:none;border:1px solid var(--bad);border-radius:8px;padding:6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt span{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:var(--chip);border:1px solid transparent;cursor:pointer;font-size:.88rem;color:var(--ink);user-select:none}
+.opt span em{font-style:normal;font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.opt input:checked+span{background:var(--accent-soft);border-color:var(--accent)}
+.opt input:checked+span em{color:var(--ink)}
+.cond{display:flex;flex-direction:column;gap:6px}
+.err{color:var(--bad);font-size:.82rem}
+.inline{display:flex;align-items:center;gap:8px;font-size:.88rem}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font:600 .95rem var(--f-body);padding:10px 16px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.btn.sm{padding:6px 11px;font-size:.84rem}
+.done{border:2px solid var(--accent);background:var(--panel);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.code{font-family:var(--f-mono);font-weight:600;color:var(--ink)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar select,.toolbar input[type=text]{width:auto;flex:1 1 150px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.item>button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:center;width:100%;padding:12px 14px;cursor:pointer}
+.item>button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.item .t{font-weight:600;color:var(--ink);min-width:0;overflow-wrap:anywhere}
+.item .m{grid-column:2/4;font-size:.8rem;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.late{color:var(--bad);font-weight:600}
+.stripe{width:5px;align-self:stretch;border-radius:3px;grid-row:1/3}
+.pill{font-family:var(--f-mono);font-size:.7rem;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.s-recibida{color:var(--blue)} .s-evaluacion{color:var(--warn)} .s-impresion{color:var(--accent)}
+.s-lista{color:var(--ok)} .s-entregada{color:var(--muted)} .s-rechazada{color:var(--bad)}
+.bg-recibida{background:var(--blue)} .bg-evaluacion{background:var(--warn)} .bg-impresion{background:var(--accent)}
+.bg-lista{background:var(--ok)} .bg-entregada{background:var(--muted)} .bg-rechazada{background:var(--bad)}
+.detail{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:14px}
+dl{display:grid;grid-template-columns:minmax(120px,180px) 1fr;gap:6px 14px;margin:0;font-size:.88rem}
+dt{color:var(--muted)} dd{margin:0;min-width:0;overflow-wrap:anywhere;color:var(--ink)}
+@media (max-width:480px){dl{grid-template-columns:1fr}dt{margin-top:6px}}
+.timeline{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.timeline li{position:relative}
+.timeline li::before{content:"";position:absolute;left:-20px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--panel);border:2px solid var(--accent)}
+.admin{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.admin h3,.sub-h{margin:0;font-family:var(--f-display);font-size:.95rem;color:var(--ink)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:10px}
+.counts{display:flex;gap:6px;flex-wrap:wrap}
+.counts .pill{background:var(--panel)}
+a{color:var(--blue)}
+/* indicadores */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi b{font-family:var(--f-display);font-size:1.6rem;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi span{font-size:.78rem;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(90px,170px) 1fr 36px;gap:10px;align-items:center;font-size:.85rem}
+.bar .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.bar .track{height:10px;background:var(--chip);border-radius:5px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:5px}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:.78rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="brand">
+    <span class="mark" role="img" aria-label="Si3"></span>
+    <div class="brand-t"><h1>Solicitud de impresión 3D</h1><small>Taller · Si-Plásticos · Si-Ensambles · Iberotech</small></div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-nueva" aria-selected="true">Nueva solicitud</button>
+    <button class="tab" role="tab" id="tab-seg" aria-selected="false">Seguimiento</button>
+    <button class="tab" role="tab" id="tab-ind" aria-selected="false" hidden>Indicadores</button>
+  </div>
+  <div class="notice" id="conn">Conectando con el registro de solicitudes…</div>
+</header>
+
+<!-- ===================== FORMULARIO ===================== -->
+<main id="view-nueva">
+<div class="notice draft" id="draft-note" hidden><span>Se recuperó un borrador sin enviar.</span><button class="btn sm" type="button" id="draft-clear">Descartar borrador</button></div>
+<form id="frm" novalidate style="margin-top:12px">
+
+<section class="block">
+  <div class="sec-h"><b>01</b><h2>Solicitante</h2></div>
+  <div class="grid">
+    <div class="f"><label class="l" for="nombre">Nombre <span class="req">*</span></label><input type="text" id="nombre" autocomplete="name"></div>
+    <div class="f"><label class="l" for="correo">Correo electrónico <span class="req">*</span></label><input type="email" id="correo" autocomplete="email"></div>
+    <div class="f"><span class="l">Planta <span class="req">*</span></span><div class="opts" id="planta">
+      <label class="opt"><input type="radio" name="planta" value="Si-Plásticos"><span>Si-Plásticos</span></label>
+      <label class="opt"><input type="radio" name="planta" value="Si-Ensambles"><span>Si-Ensambles</span></label>
+      <label class="opt"><input type="radio" name="planta" value="Iberotech"><span>Iberotech</span></label>
+    </div></div>
+    <div class="f"><label class="l" for="area">Área o departamento <span class="req">*</span></label><input type="text" id="area" list="dl-area" placeholder="Escriba o elija"><datalist id="dl-area"></datalist></div>
+  </div>
+  <div class="f">
+    <span class="l">Prioridad <span class="req">*</span></span>
+    <div class="opts" id="prioridad">
+      <label class="opt"><input type="radio" name="prioridad" value="Normal" checked><span>Normal</span></label>
+      <label class="opt"><input type="radio" name="prioridad" value="Alta"><span>Alta <em>afecta producción</em></span></label>
+      <label class="opt"><input type="radio" name="prioridad" value="Crítica"><span>Crítica <em>línea o equipo detenido</em></span></label>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="f"><label class="l" for="fechaLimite">Fecha límite requerida</label><input type="date" id="fechaLimite"><span class="hint">Fecha en que la necesita. La entrega la confirma el taller según la cola y el tiempo real de impresión.</span></div>
+    <div class="f" style="justify-content:center"><label class="inline"><input type="checkbox" id="sinFecha"> Sin fecha específica</label></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-h"><b>02</b><h2>Pieza o proyecto</h2></div>
+  <div class="grid">
+    <div class="f"><label class="l" for="pieza">Nombre de la pieza o proyecto <span class="req">*</span></label><input type="text" id="pieza" maxlength="80" placeholder="Título corto"></div>
+    <div class="f"><label class="l" for="cantidad">Cantidad de piezas <span class="req">*</span></label><input type="number" id="cantidad" min="1" step="1" value="1"></div>
+  </div>
+  <div class="f">
+    <span class="l">Tipo de uso <span class="req">*</span></span>
+    <div class="opts" id="tipoUso">
+      <label class="opt"><input type="radio" name="tipoUso" value="Repuesto o pieza funcional"><span>Repuesto o pieza funcional</span></label>
+      <label class="opt"><input type="radio" name="tipoUso" value="Dispositivo, plantilla o útil"><span>Dispositivo, plantilla o útil</span></label>
+      <label class="opt"><input type="radio" name="tipoUso" value="Prototipo o prueba de forma"><span>Prototipo o prueba de forma</span></label>
+      <label class="opt"><input type="radio" name="tipoUso" value="Señalización u organización"><span>Señalización u organización</span></label>
+      <label class="opt"><input type="radio" name="tipoUso" value="Otro"><span>Otro</span></label>
+    </div>
+  </div>
+  <div class="f"><label class="l" for="medidas">Medidas aproximadas <span class="hint">(opcional · largo × ancho × alto, mm)</span></label><input type="text" id="medidas" placeholder="Ej. 120 × 40 × 25"><span class="hint">Impresora del taller: Creality Hi, volumen máximo 260 × 260 × 300 mm. Piezas más grandes se dividen en partes.</span></div>
+  <div class="f"><label class="l" for="descripcion">Descripción y uso <span class="req">*</span></label><textarea id="descripcion" placeholder="Para qué sirve la pieza, dónde se va a montar y qué pasa si falla"></textarea></div>
+</section>
+
+<section class="block">
+  <div class="sec-h"><b>03</b><h2>Especificaciones técnicas</h2></div>
+  <div class="f">
+    <span class="l">¿Con qué cuenta para la pieza? <span class="req">*</span></span>
+    <div class="opts" id="archivoEstado">
+      <label class="opt"><input type="radio" name="archivoEstado" value="Archivo 3D"><span>Archivo 3D listo <em>.STL .STEP .3MF</em></span></label>
+      <label class="opt"><input type="radio" name="archivoEstado" value="Muestra física"><span>Muestra física para replicar</span></label>
+      <label class="opt"><input type="radio" name="archivoEstado" value="Plano o croquis"><span>Plano o croquis <em>requiere modelado</em></span></label>
+      <label class="opt"><input type="radio" name="archivoEstado" value="Solo la idea"><span>Solo la idea <em>requiere diseño</em></span></label>
+    </div>
+  </div>
+  <div class="cond" id="c-link" hidden>
+    <label class="l" for="archivoLink">Enlace al archivo 3D <span class="hint">(o adjúntelo abajo)</span></label>
+    <input type="url" id="archivoLink" placeholder="https:// (OneDrive, SharePoint, Drive, Onshape…)">
+    <span class="hint">Pegue un enlace con permiso de lectura, o adjunte el archivo abajo.</span>
+  </div>
+  <div class="cond">
+    <label class="l" for="adjuntos">Adjuntos <span class="hint">(STL, STEP, 3MF, fotos, PDF · máx. 100 MB c/u)</span></label>
+    <input type="file" id="adjuntos" multiple accept=".stl,.step,.stp,.3mf,.obj,image/*,application/pdf">
+    <span class="hint">Se guardan en la biblioteca de documentos del sitio de SharePoint del taller.</span>
+  </div>
+  <div class="f">
+    <span class="l">Condiciones de trabajo de la pieza</span>
+    <span class="hint">Marque las que apliquen. Con esto el taller define el material si usted no lo tiene claro.</span>
+    <div class="opts" id="requisitos">
+      <label class="opt"><input type="checkbox" value="Carga mecánica o impacto"><span>Carga mecánica o impacto</span></label>
+      <label class="opt"><input type="checkbox" value="Temperatura alta"><span>Temperatura alta <em>&gt;60 °C</em></span></label>
+      <label class="opt"><input type="checkbox" value="Flexible o elástica"><span>Flexible o elástica</span></label>
+      <label class="opt"><input type="checkbox" value="Contacto con aceites o químicos"><span>Contacto con aceites o químicos</span></label>
+      <label class="opt"><input type="checkbox" value="Intemperie o UV"><span>Intemperie o UV</span></label>
+      <label class="opt"><input type="checkbox" value="Encaje o ensamble con otra pieza"><span>Encaje o ensamble con otra pieza</span></label>
+      <label class="opt"><input type="checkbox" value="Solo apariencia"><span>Solo apariencia</span></label>
+    </div>
+  </div>
+  <div class="f">
+    <span class="l">Material sugerido</span>
+    <div class="opts" id="material">
+      <label class="opt"><input type="radio" name="material" value="A criterio del técnico" checked><span>A criterio del técnico</span></label>
+      <label class="opt"><input type="radio" name="material" value="PETG"><span>PETG <em>en stock</em></span></label>
+      <label class="opt"><input type="radio" name="material" value="PETG-CO"><span>PETG-CO <em>en stock</em></span></label>
+      <label class="opt"><input type="radio" name="material" value="PLA-CO"><span>PLA-CO <em>en stock</em></span></label>
+      <label class="opt"><input type="radio" name="material" value="Otro"><span>Otro material</span></label>
+    </div>
+    <input type="text" id="materialOtro" placeholder="¿Cuál material? (ABS, ASA, TPU, Nylon…)" hidden>
+    <span class="hint">Un material que no esté en stock lo debe gestionar o suministrar el área. El taller confirma el material final según las condiciones marcadas.</span>
+  </div>
+  <div class="f">
+    <span class="l">Color</span>
+    <div class="opts" id="color">
+      <label class="opt"><input type="radio" name="color" value="Negro" checked><span>Negro <em>disponible</em></span></label>
+      <label class="opt"><input type="radio" name="color" value="Otro"><span>Otro color</span></label>
+    </div>
+    <div class="cond" id="c-color" hidden>
+      <input type="text" id="colorOtro" placeholder="¿Qué color?">
+      <span class="hint">Para colores distintos a negro, el área solicitante debe suministrar el filamento.</span>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="f">
+      <span class="l">Relleno (infill)</span>
+      <div class="opts" id="relleno">
+        <label class="opt"><input type="radio" name="relleno" value="A criterio del técnico" checked><span>A criterio del técnico</span></label>
+        <label class="opt"><input type="radio" name="relleno" value="15–20 %"><span>Liviano <em>15–20 %</em></span></label>
+        <label class="opt"><input type="radio" name="relleno" value="40 %"><span>Medio <em>40 %</em></span></label>
+        <label class="opt"><input type="radio" name="relleno" value="60–100 %"><span>Robusto <em>60–100 %</em></span></label>
+      </div>
+    </div>
+    <div class="f">
+      <span class="l">Altura de capa / calidad</span>
+      <div class="opts" id="capa">
+        <label class="opt"><input type="radio" name="capa" value="A criterio del técnico" checked><span>A criterio del técnico</span></label>
+        <label class="opt"><input type="radio" name="capa" value="Borrador 0.28 mm"><span>Borrador <em>0.28 mm</em></span></label>
+        <label class="opt"><input type="radio" name="capa" value="Estándar 0.20 mm"><span>Estándar <em>0.20 mm</em></span></label>
+        <label class="opt"><input type="radio" name="capa" value="Alta calidad 0.12 mm"><span>Alta calidad <em>0.12 mm</em></span></label>
+      </div>
+      <span class="hint">Configuración actual del taller: 0.16 mm.</span>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-h"><b>04</b><h2>Observaciones y requisitos especiales</h2></div>
+  <div class="opts" id="especiales">
+    <label class="opt"><input type="checkbox" value="Tolerancias ajustadas"><span>Tolerancias ajustadas</span></label>
+    <label class="opt"><input type="checkbox" value="Soportes específicos"><span>Soportes específicos</span></label>
+    <label class="opt"><input type="checkbox" value="Insertos roscados o tuercas embebidas"><span>Insertos roscados o tuercas</span></label>
+    <label class="opt"><input type="checkbox" value="Post-procesado (lijado, pintura)"><span>Post-procesado</span></label>
+  </div>
+  <textarea id="observaciones" aria-label="Observaciones" placeholder="Cotas críticas, ajuste con otra pieza, orientación de impresión, etc."></textarea>
+</section>
+
+<div class="actions">
+  <button class="btn primary" type="submit" id="enviar">Enviar solicitud</button>
+  <span class="err" id="form-err" role="alert"></span>
+</div>
+</form>
+
+<div class="done" id="done" hidden>
+  <strong style="color:var(--ink)">Solicitud registrada: <span class="code" id="done-code"></span></strong>
+  <span>El taller la revisa y confirma material y fecha de entrega. Puede seguir el estado en la pestaña Seguimiento.</span>
+  <div class="actions" id="done-cal"></div>
+  <div class="actions" id="done-teams"></div>
+  <div class="actions"><button class="btn sm" type="button" id="otra">Hacer otra solicitud</button><button class="btn sm" type="button" id="ver">Ver seguimiento</button></div>
+</div>
+</main>
+
+<!-- ===================== SEGUIMIENTO ===================== -->
+<main id="view-seg" hidden>
+  <section class="block" style="gap:12px">
+    <div class="counts" id="counts"></div>
+    <div class="toolbar">
+      <select id="fEstado" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option value="abiertas">Abiertas</option></select>
+      <input type="text" id="fTexto" placeholder="Buscar pieza, planta, área, código" aria-label="Buscar">
+      <label class="inline"><input type="checkbox" id="fMias"> Solo mías</label>
+      <button class="btn sm" type="button" id="exportar" hidden>Exportar CSV</button>
+      <button class="btn sm" type="button" id="exportarIcs" hidden>Entregas a calendario (.ics)</button>
+    </div>
+  </section>
+  <div class="list" id="lista" style="margin-top:12px"><div class="empty">Cargando solicitudes…</div></div>
+</main>
+
+<!-- ===================== INDICADORES ===================== -->
+<main id="view-ind" hidden>
+  <div class="toolbar" style="margin-bottom:12px"><label class="l" for="fMes">Periodo</label><select id="fMes" style="width:auto"><option value="">Todo el histórico</option></select></div>
+  <div class="kpis" id="kpis"></div>
+  <section class="block" style="margin-top:12px"><h3 class="sub-h">Solicitudes por planta</h3><div class="bars" id="b-planta"></div></section>
+  <section class="block" style="margin-top:12px"><h3 class="sub-h">Solicitudes por área</h3><div class="bars" id="b-area"></div></section>
+  <section class="block" style="margin-top:12px"><h3 class="sub-h">Solicitudes por tipo de uso</h3><div class="bars" id="b-uso"></div></section>
+  <p class="hint" style="margin-top:10px"><b>Cumplimiento de entregables técnicos (%)</b> = (entregables ejecutados en tiempo / entregables programados) × 100, como en el perfil del cargo. Programado = solicitud con fecha comprometida (entrega estimada del taller o, si no hay, fecha límite del solicitante) que ya se entregó o cuya fecha ya pasó. En tiempo = entregada en o antes de esa fecha. El periodo filtra por mes de envío. Ciclo: días calendario entre el envío y el estado Entregada.</p>
+</main>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN — edite solo este bloque
+   Mientras clientId esté vacío, la app funciona en MODO DEMOSTRACIÓN:
+   los datos se guardan solo en el navegador de quien la abre.
+   ===================================================================== */
+window.CONFIG = {
+  // Microsoft Entra ID > Registros de aplicaciones > (su app) > Información general
+  tenantId: "",            // "Id. de directorio (inquilino)"
+  clientId: "",            // "Id. de aplicación (cliente)"
+
+  // Sitio de SharePoint donde viven la lista y los archivos.
+  // Formato: <host>:/sites/<nombre>   ej. "miempresa.sharepoint.com:/sites/Taller"
+  sitio: "",
+
+  lista: "Solicitudes Impresion 3D",      // nombre de la lista (la app puede crearla)
+  carpetaArchivos: "Impresion3D",         // carpeta dentro de "Documentos" del sitio
+
+  admins: ["juan.castrillon@si-3.tech"],  // ven Indicadores y gestionan estados
+  tallerEmail: "juan.castrillon@si-3.tech",
+  refrescoSeg: 60                         // cada cuánto se recarga la cola
+};
+</script>
+<!-- Librería oficial de inicio de sesión de Microsoft (MSAL 3.30.0).
+     Se usa la copia local; si no está en la misma carpeta, se carga desde jsDelivr. -->
+<script src="msal-browser.min.js"></script>
+<script>window.msal||document.write('<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.30.0/lib/msal-browser.min.js"><\/script>')</script>
+
+<script>
+(function(){
+const ESTADOS=[
+ {k:"recibida",t:"Recibida"},{k:"evaluacion",t:"En evaluación"},{k:"impresion",t:"En impresión"},
+ {k:"lista",t:"Lista para entrega"},{k:"entregada",t:"Entregada"},{k:"rechazada",t:"Rechazada"}];
+const EST=Object.fromEntries(ESTADOS.map(e=>[e.k,e.t]));
+const CERRADOS=new Set(["entregada","rechazada"]);
+const AREAS_BASE=["Producción","Mantenimiento","Calidad","Ingeniería","Logística","Taller","Seguridad y salud en el trabajo"];
+const DRAFT_KEY="si3-imp3d-borrador";
+const TALLER_EMAIL=CONFIG.tallerEmail;
+const teamsUrl=(email,msg)=>"https://teams.microsoft.com/l/chat/0/0?users="+encodeURIComponent(email)+"&message="+encodeURIComponent(msg);
+const teamsBtn=(email,msg,txt)=>`<a class="btn sm teams" href="${esc(teamsUrl(email,msg))}" target="_blank" rel="noopener">${esc(txt)}</a>`;
+const $=id=>document.getElementById(id);
+let store=null,uid=null,admin=false;
+let SOL=[],ESTD={},open=new Set(),AVISOS={};
+
+/* ---------- pestañas ---------- */
+const VIEWS={nueva:"nueva",seguimiento:"seg",indicadores:"ind"};
+function show(v){
+  if(v==="ind"&&!admin)v="seg";
+  ["nueva","seg","ind"].forEach(x=>{$("view-"+x).hidden=x!==v;$("tab-"+x).setAttribute("aria-selected",x===v)});
+  const h=Object.keys(VIEWS).find(k=>VIEWS[k]===v);
+  try{if(location.hash!=="#"+h)history.replaceState(null,"","#"+h)}catch(e){}
+  if(v==="ind")renderInd();
+}
+$("tab-nueva").onclick=()=>show("nueva"); $("tab-seg").onclick=()=>show("seg"); $("tab-ind").onclick=()=>show("ind");
+const fromHash=()=>VIEWS[location.hash.slice(1)]||"nueva";
+window.addEventListener("hashchange",()=>show(fromHash()));
+show(fromHash());
+
+/* ---------- utilidades ---------- */
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const fmt=d=>{if(!d)return"—";const x=new Date(d.length===10?d+"T12:00:00":d);return isNaN(x)?d:x.toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"})};
+const fmtDT=d=>{const x=new Date(d);return isNaN(x)?"—":x.toLocaleString("es-CO",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})};
+const radio=n=>{const r=document.querySelector(`input[name="${n}"]:checked`);return r?r.value:""};
+const setRadio=(n,v)=>{const r=[...document.querySelectorAll(`input[name="${n}"]`)].find(i=>i.value===v);if(r)r.checked=true;return!!r};
+const checks=id=>[...$(id).querySelectorAll("input:checked")].map(i=>i.value);
+const setChecks=(id,arr)=>$(id).querySelectorAll("input").forEach(i=>i.checked=(arr||[]).includes(i.value));
+const estadoDe=s=>(ESTD[s.codigo]&&ESTD[s.codigo].estado)||"recibida";
+const hoyYMD=ymd(new Date());
+
+/* ---------- calendario ---------- */
+function calLinks(titulo,fecha,detalle){
+  if(!fecha)return"";
+  const d0=fecha.replace(/-/g,""),n=new Date(fecha+"T12:00:00");n.setDate(n.getDate()+1);const d1=ymd(n).replace(/-/g,"");
+  const g="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(titulo)+"&dates="+d0+"/"+d1+"&details="+encodeURIComponent(detalle);
+  const o="https://outlook.office.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&subject="+encodeURIComponent(titulo)+"&startdt="+fecha+"&enddt="+ymd(n)+"&allday=true&body="+encodeURIComponent(detalle);
+  return `<a class="btn sm" href="${esc(g)}" target="_blank" rel="noopener">Google Calendar</a><a class="btn sm" href="${esc(o)}" target="_blank" rel="noopener">Outlook</a>`;
+}
+function icsEvent(uidv,titulo,fecha,detalle){
+  const d0=fecha.replace(/-/g,""),n=new Date(fecha+"T12:00:00");n.setDate(n.getDate()+1);
+  const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+  const e=s=>String(s).replace(/\\/g,"\\\\").replace(/[,;]/g,m=>"\\"+m).replace(/\r?\n/g,"\\n");
+  return ["BEGIN:VEVENT","UID:"+uidv+"@si3-impresion3d","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+d0,"DTEND;VALUE=DATE:"+ymd(n).replace(/-/g,""),
+    "SUMMARY:"+e(titulo),"DESCRIPTION:"+e(detalle),"BEGIN:VALARM","TRIGGER:-PT15H","ACTION:DISPLAY","DESCRIPTION:"+e(titulo),"END:VALARM","END:VEVENT"].join("\r\n");
+}
+async function saveIcs(name,events){
+  if(!events.length)return;
+  const body=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Si3//Impresion3D//ES","CALSCALE:GREGORIAN"].concat(events,["END:VCALENDAR"]).join("\r\n");
+  bajar(name,new Blob([body],{type:"text/calendar"}));
+}
+
+/* ---------- campos condicionales y borrador ---------- */
+function syncCond(){
+  $("c-link").hidden=radio("archivoEstado")!=="Archivo 3D";
+  $("materialOtro").hidden=radio("material")!=="Otro";
+  $("c-color").hidden=radio("color")!=="Otro";
+  $("fechaLimite").disabled=$("sinFecha").checked;
+}
+const TXT=["nombre","correo","area","fechaLimite","pieza","cantidad","medidas","descripcion","archivoLink","materialOtro","colorOtro","observaciones"];
+const RAD=["planta","prioridad","tipoUso","archivoEstado","material","color","relleno","capa"];
+const persona=()=>({nombre:$("nombre").value,correo:$("correo").value,planta:radio("planta"),area:$("area").value});
+const CHK=["requisitos","especiales"];
+function leerForm(){const o={};TXT.forEach(k=>o[k]=$(k).value);RAD.forEach(k=>o[k]=radio(k));CHK.forEach(k=>o[k]=checks(k));o.sinFecha=$("sinFecha").checked;return o}
+function cargarForm(o){TXT.forEach(k=>{if(o[k]!=null)$(k).value=o[k]});RAD.forEach(k=>{if(o[k])setRadio(k,o[k])});CHK.forEach(k=>setChecks(k,o[k]));$("sinFecha").checked=!!o.sinFecha;syncCond()}
+let draftT=null;
+$("frm").addEventListener("input",()=>{clearTimeout(draftT);draftT=setTimeout(()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(leerForm()))}catch(e){}},600)});
+$("frm").addEventListener("change",e=>{syncCond();const g=e.target.closest(".opts,.f,.cond");if(g)g.querySelectorAll(".bad-field").forEach(x=>x.classList.remove("bad-field"));e.target.classList&&e.target.classList.remove("bad-field");if(e.target.closest(".opts"))e.target.closest(".opts").classList.remove("bad-field")});
+function borrarDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){};$("draft-note").hidden=true}
+try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null");if(d&&(d.pieza||d.descripcion)){cargarForm(d);$("draft-note").hidden=false}}catch(e){}
+$("draft-clear").onclick=()=>{const keep=persona();$("frm").reset();cargarForm(keep);borrarDraft()};
+syncCond();
+$("fechaLimite").min=hoyYMD;
+
+/* ---------- validación y envío ---------- */
+function codigo(){const d=new Date();return "IMP-"+String(d.getFullYear()).slice(2)+pad(d.getMonth()+1)+pad(d.getDate())+"-"+Math.random().toString(36).slice(2,6).toUpperCase()}
+function validar(){
+  document.querySelectorAll(".bad-field").forEach(x=>x.classList.remove("bad-field"));
+  const f=[],el=[];const v=id=>$(id).value.trim();
+  const mal=(nombre,id)=>{f.push(nombre);el.push($(id));$(id).classList.add("bad-field")};
+  if(!v("nombre"))mal("nombre","nombre");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v("correo")))mal("correo válido","correo");
+  if(!radio("planta"))mal("planta","planta"); if(!v("area"))mal("área","area");
+  if(!$("sinFecha").checked&&!v("fechaLimite"))mal("fecha límite (o marque “Sin fecha específica”)","fechaLimite");
+  else if(!$("sinFecha").checked&&v("fechaLimite")<hoyYMD)mal("fecha límite no puede ser pasada","fechaLimite");
+  if(!v("pieza"))mal("nombre de la pieza","pieza");
+  if(!(parseInt(v("cantidad"),10)>=1))mal("cantidad","cantidad");
+  if(!radio("tipoUso"))mal("tipo de uso","tipoUso");
+  if(!v("descripcion"))mal("descripción y uso","descripcion");
+  if(!radio("archivoEstado"))mal("con qué cuenta para la pieza","archivoEstado");
+  if(radio("archivoEstado")==="Archivo 3D"&&!/^https?:\/\//i.test(v("archivoLink"))&&!$("adjuntos").files.length)mal("enlace o archivo 3D adjunto","archivoLink");
+  if([...$("adjuntos").files].some(f=>f.size>100*1024*1024))mal("adjunto mayor a 100 MB","adjuntos");
+  if(radio("material")==="Otro"&&!v("materialOtro"))mal("material","materialOtro");
+  if(radio("color")==="Otro"&&!v("colorOtro"))mal("color","colorOtro");
+  if(el.length){el[0].scrollIntoView({behavior:"smooth",block:"center"});const fo=el[0].matches("input,textarea")?el[0]:el[0].querySelector("input");fo&&fo.focus({preventScroll:true})}
+  return f;
+}
+$("frm").addEventListener("submit",async ev=>{
+  ev.preventDefault();
+  const falta=validar();
+  if(falta.length){$("form-err").textContent="Revise: "+falta.join(", ")+".";return}
+  if(!store||!store.listo){$("form-err").textContent="No hay conexión con el registro. Inicie sesión con su cuenta de Si3 e intente de nuevo.";return}
+  $("form-err").textContent="";const b=$("enviar");b.disabled=true;b.textContent="Enviando…";
+  try{
+    const v=id=>$(id).value.trim();const cod=codigo();
+    const adj=[];
+    for(const fl of [...$("adjuntos").files]){
+      b.textContent="Subiendo "+fl.name+"…";
+      adj.push(await store.subir(fl,cod));
+    }
+    const doc={
+      codigo:cod,creado:new Date().toISOString(),creadoPor:uid||"",
+      nombre:v("nombre"),correo:v("correo"),planta:radio("planta"),area:v("area"),
+      prioridad:radio("prioridad"),fechaLimite:$("sinFecha").checked?"":v("fechaLimite"),
+      pieza:v("pieza"),cantidad:parseInt(v("cantidad"),10),medidas:v("medidas"),tipoUso:radio("tipoUso"),descripcion:v("descripcion"),
+      archivoEstado:radio("archivoEstado"),archivoLink:radio("archivoEstado")==="Archivo 3D"?v("archivoLink"):"",adjuntos:adj,
+      requisitos:checks("requisitos"),
+      material:radio("material")==="Otro"?v("materialOtro"):radio("material"),
+      color:radio("color")==="Otro"?v("colorOtro")+" (filamento lo suministra el área)":"Negro",
+      relleno:radio("relleno"),capa:radio("capa"),
+      especiales:checks("especiales"),observaciones:v("observaciones")
+    };
+    await store.crear(doc);cargar();
+    borrarDraft();
+    $("done-code").textContent=cod;
+    $("done-cal").innerHTML=doc.fechaLimite?`<span class="hint">Recordatorio de su fecha límite:</span>`+calLinks("Pieza 3D requerida: "+doc.pieza+" ("+cod+")",doc.fechaLimite,"Solicitud "+cod+" al taller de impresión 3D. Cantidad: "+doc.cantidad):"";
+    $("done-teams").innerHTML=teamsBtn(TALLER_EMAIL,"Hola, envié la solicitud de impresión 3D "+cod+": "+doc.pieza+" × "+doc.cantidad+" ("+doc.planta+", "+doc.area+", prioridad "+doc.prioridad+").","Avisar al taller por Teams");
+    $("frm").hidden=true;$("done").hidden=false;window.scrollTo(0,0);
+  }catch(e){
+    console.error(e);
+    $("form-err").textContent=(e&&e.status===403)
+      ?"Su usuario no tiene permiso de edición en la lista del taller. Pida acceso al taller."
+      :"No se pudo enviar ("+(e&&(e.status||e.message)||"error")+"). Intente de nuevo.";
+  }finally{b.disabled=false;b.textContent="Enviar solicitud"}
+});
+function nuevaLimpia(prefill){
+  const keep=persona();
+  $("frm").reset();cargarForm(Object.assign(keep,prefill||{}));$("adjuntos").value="";
+  $("frm").hidden=false;$("done").hidden=true;
+}
+$("otra").onclick=()=>nuevaLimpia(); $("ver").onclick=()=>{nuevaLimpia();show("seg")};
+function repetir(s){
+  const mat=["A criterio del técnico","PETG","PETG-CO","PLA-CO"];
+  const col=s.color==="Negro"?{color:"Negro"}:{color:"Otro",colorOtro:String(s.color||"").replace(" (filamento lo suministra el área)","")};
+  nuevaLimpia(Object.assign({
+    planta:s.planta,area:s.area,pieza:s.pieza,cantidad:s.cantidad,medidas:s.medidas||"",tipoUso:s.tipoUso,descripcion:s.descripcion,
+    archivoEstado:s.archivoEstado,archivoLink:s.archivoLink||"",requisitos:s.requisitos,
+    material:mat.includes(s.material)?s.material:"Otro",materialOtro:mat.includes(s.material)?"":s.material,
+    relleno:s.relleno,capa:s.capa,especiales:s.especiales,observaciones:s.observaciones||"",fechaLimite:"",sinFecha:false
+  },col));
+  show("nueva");window.scrollTo(0,0);
+  $("form-err").textContent="Datos copiados de "+s.codigo+". Revise la fecha límite y envíe.";
+}
+
+/* ---------- seguimiento ---------- */
+ESTADOS.forEach(e=>{const o=document.createElement("option");o.value=e.k;o.textContent=e.t;$("fEstado").appendChild(o)});
+["fEstado","fTexto","fMias"].forEach(id=>$(id).addEventListener("input",render));
+const vencida=s=>s.fechaLimite&&!CERRADOS.has(estadoDe(s))&&s.fechaLimite<hoyYMD;
+
+function render(){
+  const lista=$("lista");
+  const cnt={};SOL.forEach(s=>{const k=estadoDe(s);cnt[k]=(cnt[k]||0)+1});
+  const nV=SOL.filter(vencida).length;
+  $("counts").innerHTML=(ESTADOS.filter(e=>cnt[e.k]).map(e=>`<span class="pill s-${e.k}">${esc(e.t)}: ${cnt[e.k]}</span>`).join("")+(nV?`<span class="pill late">Vencidas: ${nV}</span>`:""))||`<span class="hint">Sin solicitudes registradas.</span>`;
+  const fe=$("fEstado").value,ft=$("fTexto").value.trim().toLowerCase(),fm=$("fMias").checked;
+  const rows=SOL.filter(s=>(!fe||(fe==="abiertas"?!CERRADOS.has(estadoDe(s)):estadoDe(s)===fe))&&(!fm||(uid&&s.creadoPor===uid))&&
+    (!ft||[s.codigo,s.pieza,s.planta,s.area,s.nombre].join(" ").toLowerCase().includes(ft)));
+  if(!SOL.length){lista.innerHTML=`<div class="empty">Aún no hay solicitudes. La primera que se envíe desde “Nueva solicitud” aparecerá aquí con su estado.</div>`;return}
+  if(!rows.length){lista.innerHTML=`<div class="empty">Ninguna solicitud coincide con el filtro.</div>`;return}
+  lista.innerHTML="";
+  rows.forEach(s=>{
+    const k=estadoDe(s),E=ESTD[s.codigo]||{};
+    const el=document.createElement("div");el.className="item";
+    el.innerHTML=`<button type="button" aria-expanded="${open.has(s.codigo)}">
+      <span class="stripe bg-${k}"></span>
+      <span class="t">${esc(s.pieza)} <span class="hint">× ${esc(s.cantidad)}</span></span>
+      <span class="pill s-${k}">${esc(EST[k])}</span>
+      <span class="m"><span class="code">${esc(s.codigo)}</span> · ${esc(s.planta)} · ${esc(s.area)} · ${esc(s.prioridad)} · necesita: ${vencida(s)?`<span class="late">${esc(fmt(s.fechaLimite))} (vencida)</span>`:esc(s.fechaLimite?fmt(s.fechaLimite):"sin fecha")}${E.fechaEntrega?" · entrega estimada: "+esc(fmt(E.fechaEntrega)):""}</span>
+    </button>`;
+    el.firstElementChild.onclick=()=>{open.has(s.codigo)?open.delete(s.codigo):open.add(s.codigo);render()};
+    if(open.has(s.codigo))el.appendChild(detalle(s,k,E));
+    lista.appendChild(el);
+  });
+}
+function detalle(s,k,E){
+  const d=document.createElement("div");d.className="detail";
+  const adj=(s.adjuntos||[]).map(a=>`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.nombre)}</a>`).join(", ");
+  const link=s.archivoLink?`<a href="${esc(s.archivoLink)}" target="_blank" rel="noopener">abrir enlace</a>`:"";
+  const rowsDl=[
+    ["Solicitante",`${esc(s.nombre)} · ${esc(s.correo)}`],["Fecha de solicitud",esc(fmtDT(s.creado))],
+    ["Tipo de uso",esc(s.tipoUso)],["Medidas aprox.",esc(s.medidas||"—")],["Descripción",esc(s.descripcion)],
+    ["Cuenta con",esc(s.archivoEstado)+(link?" · "+link:"")],["Adjuntos",adj||"—"],
+    ["Condiciones",esc((s.requisitos||[]).join(", ")||"—")],["Material sugerido",esc(s.material)],["Color",esc(s.color)],
+    ["Relleno",esc(s.relleno)],["Capa",esc(s.capa)],
+    ["Requisitos especiales",esc((s.especiales||[]).join(", ")||"—")],["Observaciones",esc(s.observaciones||"—")],
+    ["Nota del taller",esc(E.nota||"—")]];
+  if(E.materialReal||E.horas||E.gramos)rowsDl.push(["Producción real",esc([E.materialReal,E.horas?E.horas+" h":"",E.gramos?E.gramos+" g":""].filter(Boolean).join(" · "))]);
+  const hist=[{estado:"recibida",fecha:s.creado}].concat(E.historial||[]);
+  d.innerHTML=`<dl>${rowsDl.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join("")}</dl>
+    <div><h3 class="sub-h" style="margin-bottom:8px">Historial</h3><ul class="timeline">${hist.map(h=>`<li><span class="pill s-${esc(h.estado)}">${esc(EST[h.estado]||h.estado)}</span> <span class="hint">${esc(fmtDT(h.fecha))}</span></li>`).join("")}</ul></div>`;
+  const acc=document.createElement("div");acc.className="actions";
+  const fCal=E.fechaEntrega||s.fechaLimite;
+  if(fCal&&!CERRADOS.has(k)){acc.innerHTML=`<span class="hint">Agregar ${E.fechaEntrega?"entrega estimada":"fecha límite"} al calendario:</span>`+calLinks((E.fechaEntrega?"Entrega pieza 3D: ":"Pieza 3D requerida: ")+s.pieza+" ("+s.codigo+")",fCal,"Solicitud "+s.codigo+" · "+s.planta+" · "+s.area+" · Cantidad "+s.cantidad)}
+  if(!admin)acc.insertAdjacentHTML("beforeend",teamsBtn(TALLER_EMAIL,"Hola, pregunto por la solicitud de impresión 3D "+s.codigo+" ("+s.pieza+").","Escribir al taller por Teams"));
+  const rep=document.createElement("button");rep.type="button";rep.className="btn sm";rep.textContent="Repetir esta solicitud";rep.onclick=()=>repetir(s);acc.appendChild(rep);
+  d.appendChild(acc);
+  if(admin)d.appendChild(panelAdmin(s,k,E));
+  return d;
+}
+function panelAdmin(s,k,E){
+  const p=document.createElement("div");p.className="admin";const id="a-"+s.codigo.replace(/[^A-Za-z0-9-]/g,"");
+  p.innerHTML=`<h3>Gestión del taller</h3>
+    <div class="grid">
+      <div class="f"><label class="l" for="${id}-e">Estado</label><select id="${id}-e">${ESTADOS.map(e=>`<option value="${e.k}"${e.k===k?" selected":""}>${e.t}</option>`).join("")}</select></div>
+      <div class="f"><label class="l" for="${id}-f">Entrega estimada</label><input type="date" id="${id}-f" value="${esc(E.fechaEntrega||"")}"></div>
+      <div class="f"><label class="l" for="${id}-m">Material usado</label><input type="text" id="${id}-m" value="${esc(E.materialReal||"")}" placeholder="Ej. PETG negro"></div>
+      <div class="grid" style="gap:10px">
+        <div class="f"><label class="l" for="${id}-h">Horas de máquina</label><input type="number" min="0" step="0.1" id="${id}-h" value="${esc(E.horas??"")}"></div>
+        <div class="f"><label class="l" for="${id}-g">Gramos</label><input type="number" min="0" step="1" id="${id}-g" value="${esc(E.gramos??"")}"></div>
+      </div>
+      <div class="f full"><label class="l" for="${id}-n">Nota para el solicitante</label><input type="text" id="${id}-n" value="${esc(E.nota||"")}" placeholder="Material confirmado, tiempo estimado, motivo de rechazo…"></div>
+    </div>
+    <div class="actions"><button class="btn sm primary" type="button">Guardar</button><span class="hint" role="status"></span><span class="actions" data-teams>${AVISOS[s.codigo]||""}</span></div>`;
+  const q=x=>p.querySelector("#"+id+"-"+x);
+  const btn=p.querySelector("button"),st=p.querySelector('[role="status"]');
+  btn.onclick=async()=>{
+    btn.disabled=true;st.textContent="Guardando…";
+    const nuevo=q("e").value,hist=(E.historial||[]).slice();
+    if(nuevo!==k)hist.push({estado:nuevo,fecha:new Date().toISOString()});
+    const num=x=>{const n=parseFloat(q(x).value);return isNaN(n)?null:n};
+    try{const o={estado:nuevo,fechaEntrega:q("f").value,nota:q("n").value.trim(),
+        materialReal:q("m").value.trim(),horas:num("h"),gramos:num("g"),historial:hist,actualizado:new Date().toISOString()};
+      await store.guardarEstado(s.codigo,o);ESTD[s.codigo]=o;
+      st.textContent="Guardado";
+      const fe=q("f").value,nt=q("n").value.trim();
+      const msg="Hola "+(s.nombre||"")+". Su solicitud de impresión 3D "+s.codigo+" ("+s.pieza+") está ahora: "+EST[nuevo]+"."+(fe?" Entrega estimada: "+fmt(fe)+".":"")+(nt?" Nota: "+nt:"");
+      AVISOS[s.codigo]='<span class="hint">Guardado.</span>'+(s.correo?teamsBtn(s.correo,msg,"Avisar al solicitante por Teams"):"");
+      p.querySelector("[data-teams]").innerHTML=AVISOS[s.codigo];}
+    catch(e){console.error(e);st.textContent="No se pudo guardar ("+(e&&(e.status||e.message)||"error")+")"}finally{btn.disabled=false}
+    render();renderInd();
+  };
+  return p;
+}
+function datalists(){
+  const uniq=a=>[...new Set(a.filter(Boolean).map(x=>x.trim()))].sort((a,b)=>a.localeCompare(b,"es"));
+  $("dl-area").innerHTML=uniq(AREAS_BASE.concat(SOL.map(s=>s.area))).map(x=>`<option value="${esc(x)}">`).join("");
+}
+
+/* ---------- indicadores ---------- */
+function bars(id,map){
+  const arr=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,10);const max=Math.max(1,...arr.map(a=>a[1]));
+  $(id).innerHTML=arr.length?arr.map(([n,v])=>`<div class="bar"><span class="n" title="${esc(n)}">${esc(n)}</span><span class="track"><span class="fill" style="display:block;width:${(v/max*100).toFixed(1)}%"></span></span><span class="v">${v}</span></div>`).join(""):`<span class="hint">Sin datos todavía.</span>`;
+}
+const mesDe=s=>String(s.creado||"").slice(0,7);
+$("fMes").addEventListener("change",renderInd);
+function meses(){
+  const sel=$("fMes"),cur=sel.value,ms=[...new Set(SOL.map(mesDe).filter(Boolean))].sort().reverse();
+  sel.innerHTML='<option value="">Todo el histórico</option>'+ms.map(m=>{const d=new Date(m+"-15T12:00:00");return `<option value="${m}">${d.toLocaleDateString("es-CO",{month:"long",year:"numeric"})}</option>`}).join("");
+  sel.value=ms.includes(cur)?cur:"";
+}
+function renderInd(){
+  if($("view-ind").hidden)return;
+  const mes=$("fMes").value,L=SOL.filter(s=>!mes||mesDe(s)===mes);
+  const tot=L.length,abiertas=L.filter(s=>!CERRADOS.has(estadoDe(s))).length;
+  let prog=0,enT=0,ciclos=[],horas=0,gramos=0,rech=0;
+  L.forEach(s=>{
+    const E=ESTD[s.codigo]||{},k=estadoDe(s),comp=E.fechaEntrega||s.fechaLimite;
+    if(k==="rechazada")rech++;
+    horas+=+E.horas||0;gramos+=+E.gramos||0;
+    const h=k==="entregada"?(E.historial||[]).filter(x=>x.estado==="entregada").pop():null;
+    if(h)ciclos.push((new Date(h.fecha)-new Date(s.creado))/864e5);
+    if(comp&&k!=="rechazada"){
+      if(h){prog++;if(ymd(new Date(h.fecha))<=comp)enT++}
+      else if(comp<hoyYMD)prog++;
+    }
+  });
+  const prom=ciclos.length?(ciclos.reduce((a,b)=>a+b,0)/ciclos.length).toFixed(1):"—";
+  const k=(v,t)=>`<div class="kpi"><b>${v}</b><span>${t}</span></div>`;
+  $("kpis").innerHTML=k(prog?Math.round(enT/prog*100)+" %":"—","Cumplimiento de entregables técnicos ("+enT+"/"+prog+")")+k(tot,"Solicitudes en el periodo")+k(abiertas,"Abiertas")+k(prom,"Ciclo promedio (días)")
+    +k(horas?horas.toFixed(1):"0","Horas de máquina")+k(gramos?Math.round(gramos):"0","Gramos de material")+k(tot?Math.round(rech/tot*100)+" %":"—","Rechazadas")+k(L.filter(vencida).length,"Vencidas sin entregar");
+  const by=f=>L.reduce((m,s)=>{const x=(s[f]||"Sin dato").trim();m[x]=(m[x]||0)+1;return m},{});
+  bars("b-planta",by("planta"));bars("b-area",by("area"));bars("b-uso",by("tipoUso"));
+}
+
+/* ---------- exportar ---------- */
+$("exportar").onclick=async()=>{
+  const cols=["codigo","creado","nombre","correo","planta","area","prioridad","fechaLimite","pieza","cantidad","tipoUso","descripcion","archivoEstado","archivoLink","requisitos","material","color","relleno","capa","especiales","observaciones","medidas"];
+  const q=x=>'"'+String(Array.isArray(x)?x.join("; "):x??"").replace(/"/g,'""')+'"';
+  const head=cols.concat(["estado","fechaEntrega","materialReal","horas","gramos","notaTaller"]).join(";");
+  const lines=SOL.map(s=>{const E=ESTD[s.codigo]||{};return cols.map(c=>q(s[c])).concat([q(EST[estadoDe(s)]),q(E.fechaEntrega),q(E.materialReal),q(E.horas),q(E.gramos),q(E.nota)]).join(";")});
+  bajar("solicitudes-impresion-3d.csv",new Blob(["\ufeff"+[head].concat(lines).join("\r\n")],{type:"text/csv"}));
+};
+$("exportarIcs").onclick=()=>{
+  const ev=SOL.filter(s=>!CERRADOS.has(estadoDe(s))).map(s=>{const E=ESTD[s.codigo]||{};const f=E.fechaEntrega||s.fechaLimite;
+    return f?icsEvent(s.codigo,(E.fechaEntrega?"Entrega 3D: ":"Límite 3D: ")+s.pieza+" ("+s.codigo+")",f,s.planta+" · "+s.area+" · Cant. "+s.cantidad+" · "+s.nombre):null}).filter(Boolean);
+  saveIcs("entregas-impresion-3d.ics",ev);
+};
+
+/* ---------- descargas ---------- */
+function bajar(nombre,blob){
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=nombre;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+}
+
+/* ---------- almacenamiento: modo demostración (navegador) ---------- */
+function StoreDemo(){
+  const K="si3-imp3d-demo";
+  const leer=()=>{try{return JSON.parse(localStorage.getItem(K)||'{"sols":[],"estados":{}}')}catch(e){return{sols:[],estados:{}}}};
+  const escribir=d=>{try{localStorage.setItem(K,JSON.stringify(d))}catch(e){}};
+  return{
+    listo:true,demo:true,
+    async yo(){return{nombre:"",correo:"demo@local",admin:true}},
+    async listar(){return leer()},
+    async crear(doc){const d=leer();d.sols.push(doc);escribir(d)},
+    async guardarEstado(cod,o){const d=leer();d.estados[cod]=o;escribir(d)},
+    async subir(f){return{nombre:f.name,url:""}}
+  };
+}
+
+/* ---------- almacenamiento: SharePoint vía Microsoft Graph ---------- */
+function StoreGraph(cfg){
+  const GRAPH="https://graph.microsoft.com/v1.0";
+  const SCOPES=["User.Read","Sites.ReadWrite.All"];
+  let pca,account,siteId,listId;const itemIds={};
+  const LBL=Object.fromEntries(ESTADOS.map(e=>[e.k,e.t])),KEY=Object.fromEntries(ESTADOS.map(e=>[e.t,e.k]));
+
+  async function token(scopes){
+    scopes=scopes||SCOPES;
+    try{return(await pca.acquireTokenSilent({scopes,account})).accessToken}
+    catch(e){
+      if(e instanceof msal.InteractionRequiredAuthError){await pca.acquireTokenRedirect({scopes,account});}
+      throw e;
+    }
+  }
+  async function g(method,path,body,scopes){
+    const r=await fetch(path.startsWith("http")?path:GRAPH+path,{method,
+      headers:Object.assign({Authorization:"Bearer "+await token(scopes)},body?{"Content-Type":"application/json"}:{}),
+      body:body?JSON.stringify(body):undefined});
+    if(!r.ok){const t=await r.text();const e=new Error(r.status+" "+t.slice(0,300));e.status=r.status;throw e}
+    return r.status===204?null:r.json();
+  }
+  const ruta=p=>p.split("/").map(encodeURIComponent).join("/");
+  const COLS=[
+    ["Datos",{text:{allowMultipleLines:true}}],["Estado",{text:{}}],["Planta",{text:{}}],["Area",{text:{}}],
+    ["Solicitante",{text:{}}],["Correo",{text:{}}],["Pieza",{text:{}}],["Cantidad",{number:{}}],["Prioridad",{text:{}}],
+    ["FechaLimite",{text:{}}],["FechaEntrega",{text:{}}],["Nota",{text:{allowMultipleLines:true}}],["MaterialReal",{text:{}}],
+    ["Horas",{number:{}}],["Gramos",{number:{}}],["Historial",{text:{allowMultipleLines:true}}],["Creado",{text:{}}]];
+
+  const api={
+    listo:false,demo:false,sinLista:false,
+    async iniciar(){
+      pca=new msal.PublicClientApplication({auth:{clientId:cfg.clientId,authority:"https://login.microsoftonline.com/"+cfg.tenantId,
+        redirectUri:location.origin+location.pathname},cache:{cacheLocation:"localStorage"}});
+      await pca.initialize();
+      const res=await pca.handleRedirectPromise();
+      account=(res&&res.account)||pca.getAllAccounts()[0];
+      if(!account)return false;
+      siteId=(await g("GET","/sites/"+cfg.sitio+"?$select=id")).id;
+      const ls=await g("GET","/sites/"+siteId+"/lists?$select=id,displayName&$top=999");
+      const l=(ls.value||[]).find(x=>x.displayName===cfg.lista);
+      if(l){listId=l.id;api.listo=true}else api.sinLista=true;
+      return true;
+    },
+    entrar(){pca.loginRedirect({scopes:SCOPES})},
+    async yo(){const m=await g("GET","/me?$select=displayName,mail,userPrincipalName");
+      const correo=(m.mail||m.userPrincipalName||"").toLowerCase();
+      return{nombre:m.displayName||"",correo,admin:cfg.admins.map(x=>x.toLowerCase()).includes(correo)}},
+    async crearLista(){
+      const r=await g("POST","/sites/"+siteId+"/lists",{displayName:cfg.lista,list:{template:"genericList"},
+        columns:COLS.map(([name,t])=>Object.assign({name},t))},["Sites.Manage.All"]);
+      listId=r.id;api.listo=true;api.sinLista=false;
+    },
+    async listar(){
+      const sols=[],estados={};let url="/sites/"+siteId+"/lists/"+listId+"/items?expand=fields&$top=500";
+      while(url){
+        const r=await g("GET",url);
+        (r.value||[]).forEach(it=>{
+          const f=it.fields||{};let doc={};try{doc=JSON.parse(f.Datos||"{}")}catch(e){}
+          if(!doc.codigo)return;itemIds[doc.codigo]=it.id;sols.push(doc);
+          let h=[];try{h=JSON.parse(f.Historial||"[]")}catch(e){}
+          estados[doc.codigo]={estado:KEY[f.Estado]||"recibida",fechaEntrega:f.FechaEntrega||"",nota:f.Nota||"",
+            materialReal:f.MaterialReal||"",horas:f.Horas??null,gramos:f.Gramos??null,historial:h};
+        });
+        url=r["@odata.nextLink"]||null;
+      }
+      return{sols,estados};
+    },
+    async crear(d){
+      const r=await g("POST","/sites/"+siteId+"/lists/"+listId+"/items",{fields:{
+        Title:d.codigo,Datos:JSON.stringify(d),Estado:LBL.recibida,Planta:d.planta,Area:d.area,Solicitante:d.nombre,
+        Correo:d.correo,Pieza:d.pieza,Cantidad:d.cantidad,Prioridad:d.prioridad,FechaLimite:d.fechaLimite||"",Creado:d.creado}});
+      itemIds[d.codigo]=r.id;
+    },
+    async guardarEstado(cod,o){
+      const f={Estado:LBL[o.estado],FechaEntrega:o.fechaEntrega||"",Nota:o.nota||"",MaterialReal:o.materialReal||"",Historial:JSON.stringify(o.historial||[])};
+      if(o.horas!=null)f.Horas=o.horas; if(o.gramos!=null)f.Gramos=o.gramos;
+      await g("PATCH","/sites/"+siteId+"/lists/"+listId+"/items/"+itemIds[cod]+"/fields",f);
+    },
+    async subir(file,cod){
+      const nombre=file.name.replace(/[\\/:*?"<>|#%]/g,"_");
+      const p=ruta(cfg.carpetaArchivos+"/"+cod+"/"+nombre);
+      let item;
+      if(file.size<=4*1024*1024){
+        const r=await fetch(GRAPH+"/sites/"+siteId+"/drive/root:/"+p+":/content",{method:"PUT",
+          headers:{Authorization:"Bearer "+await token(),"Content-Type":"application/octet-stream"},body:file});
+        if(!r.ok){const e=new Error(r.status+" subida");e.status=r.status;throw e}
+        item=await r.json();
+      }else{
+        const ses=await g("POST","/sites/"+siteId+"/drive/root:/"+p+":/createUploadSession",{item:{"@microsoft.graph.conflictBehavior":"rename"}});
+        const CH=10*327680;
+        for(let ini=0;ini<file.size;ini+=CH){
+          const fin=Math.min(ini+CH,file.size);
+          const r=await fetch(ses.uploadUrl,{method:"PUT",headers:{"Content-Range":"bytes "+ini+"-"+(fin-1)+"/"+file.size},body:file.slice(ini,fin)});
+          if(!r.ok){const e=new Error(r.status+" subida");e.status=r.status;throw e}
+          if(fin===file.size)item=await r.json();
+        }
+      }
+      return{nombre:file.name,url:item.webUrl};
+    }
+  };
+  return api;
+}
+
+/* ---------- carga y conexión ---------- */
+let cargando=false;
+async function cargar(){
+  if(!store||!store.listo||cargando)return;cargando=true;
+  try{
+    const r=await store.listar();
+    SOL=r.sols.sort((a,b)=>String(b.creado).localeCompare(String(a.creado)));ESTD=r.estados;
+    $("conn").hidden=!store.demo;datalists();meses();render();renderInd();
+  }catch(e){console.error(e);$("conn").hidden=false;$("conn").textContent="No se pudo leer la lista del taller ("+(e.status||e.message)+").";}
+  finally{cargando=false}
+}
+function aviso(html){$("conn").hidden=false;$("conn").innerHTML=html}
+(async()=>{
+  const cfg=window.CONFIG||{};
+  if(!cfg.clientId){
+    store=StoreDemo();
+    aviso("<b>Modo demostración.</b> Los datos se guardan solo en este navegador. Para conectar con SharePoint, complete el bloque CONFIG al inicio del archivo.");
+  }else{
+    if(!window.msal){aviso("No se pudo cargar la librería de inicio de sesión de Microsoft. Copie msal-browser.min.js junto a este archivo.");render();return}
+    store=StoreGraph(cfg);
+    try{
+      const ok=await store.iniciar();
+      if(!ok){aviso('Inicie sesión con su cuenta de Si3 para enviar y consultar solicitudes. <button class="btn sm primary" type="button" id="btn-login">Iniciar sesión con Microsoft</button>');
+        $("btn-login").onclick=()=>store.entrar();render();return}
+    }catch(e){console.error(e);aviso("No se pudo conectar con SharePoint ("+esc(e.status||e.message)+"). Revise el bloque CONFIG.");render();return}
+  }
+  try{const me=await store.yo();uid=me.correo;admin=!!me.admin;
+    if(me.nombre&&!$("nombre").value)$("nombre").value=me.nombre;
+    if(me.correo&&!store.demo&&!$("correo").value)$("correo").value=me.correo;}catch(e){console.error(e)}
+  if(admin){$("tab-ind").hidden=false;$("exportar").hidden=false;$("exportarIcs").hidden=false;if(location.hash==="#indicadores")show("ind")}
+  if(store.sinLista){
+    if(admin){aviso('La lista "'+esc(cfg.lista)+'" no existe en el sitio. <button class="btn sm primary" type="button" id="btn-lista">Crear lista</button>');
+      $("btn-lista").onclick=async()=>{try{await store.crearLista();cargar()}catch(e){console.error(e);aviso("No se pudo crear la lista ("+esc(e.status||e.message)+"). Créela a mano con las columnas de la guía.")}};}
+    else aviso("El registro del taller no está configurado todavía. Avise al taller.");
+    render();return;
+  }
+  await cargar();
+  setInterval(()=>{if(document.visibilityState==="visible")cargar()},(cfg.refrescoSeg||60)*1000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")cargar()});
+})();
+
+})();
+</script>
+
+</body>
+</html>
